@@ -287,6 +287,9 @@ height = 16.9972
 
 [node name="player" type="CharacterBody2D"]
 script = ExtResource("1_jvo3b")
+SPEED = null
+JUMP_VELOCITY = null
+DOUBLE_JUMP_VELOCITY = null
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 libraries = {
