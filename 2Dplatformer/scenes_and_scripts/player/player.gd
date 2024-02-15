@@ -14,20 +14,21 @@ var afterJumpIsOnFloorMoment1 = 0
 var has_double_jump : bool = false
 var is_jump_pressed = [Input.is_action_pressed("jump1"), Input.is_action_pressed("jump2")]
 var is_just_jump_pressed = [Input.is_action_just_pressed("jump1"), Input.is_action_just_pressed("jump2")]
-var direction = Input.get_vector("left1", "right1", "jump1", "")
+var direction1 = Vector2.ZERO
+var direction2 = Vector2.ZERO
 
 
 func _ready():
 	get_viewport().content_scale_factor = 2.4
 	animation_tree.active = true
 	
-func anim_update():
+func anim_update(direction):
 	animation_tree.set("parameters/BlendSpace1D/blend_position", direction.x)
 	
 func update_facing_direction():
-	if direction.x > 0:
+	if direction1.x > 0 or direction2.x > 0:
 		sprite.flip_h = false
-	elif direction.x < 0:
+	elif direction1.x < 0 or direction2.x < 0:
 		sprite.flip_h = true
 
 func _physics_process(delta):
@@ -51,13 +52,16 @@ func _physics_process(delta):
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
-	var direction1 = Input.get_axis("move_left1", "move_right1", "jump1", "move_down1")
-	var direction2 = Input.get_axis("move_left2", "move_right2", "jump2", "move_down2")
-	if direction1:
-		velocity.x = direction1 * SPEED
-	elif direction2:
-		velocity.x = direction2 * SPEED
+	direction1 = Input.get_vector("move_left1", "move_right1", "jump1", "move_down1")
+	direction2 = Input.get_vector("move_left2", "move_right2", "jump2", "move_down2")
+	if direction1.x != 0:
+		velocity.x = direction1.x * SPEED
+		anim_update(direction1)
+	elif direction2.x != 0:
+		velocity.x = direction2.x * SPEED
+		anim_update(direction2)
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
+	update_facing_direction()
 	move_and_slide()
