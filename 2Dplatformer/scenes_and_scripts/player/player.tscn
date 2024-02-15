@@ -1,14 +1,10 @@
-[gd_scene load_steps=14 format=3 uid="uid://dw10iobdk2oix"]
+[gd_scene load_steps=20 format=3 uid="uid://dw10iobdk2oix"]
 
 [ext_resource type="Script" path="res://scenes_and_scripts/player/player.gd" id="1_jvo3b"]
 [ext_resource type="Texture2D" uid="uid://cv50qp1c54xec" path="res://sprites/player/idle sheet-Sheet.png" id="2_rrjsi"]
 [ext_resource type="Texture2D" uid="uid://didlbv7lv4de8" path="res://sprites/player/itch run-Sheet sheet.png" id="3_b3yvx"]
 [ext_resource type="Texture2D" uid="uid://cdpcx60j6rqpi" path="res://sprites/player/itch jump sheet-Sheet.png" id="4_dy10j"]
 [ext_resource type="Texture2D" uid="uid://cnd04peygimh1" path="res://sprites/player/itch hurt 2 sheet-Sheet.png" id="5_x6yap"]
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_beqb8"]
-radius = 5.09915
-height = 16.9972
 
 [sub_resource type="Animation" id="Animation_hk826"]
 resource_name = "idle"
@@ -259,10 +255,49 @@ _data = {
 "run": SubResource("Animation_smrdf")
 }
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3txbo"]
+animation = &"idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_pvi31"]
+animation = &"run"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_bcp11"]
+animation = &"run"
+
+[sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_t4bb4"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_3txbo")
+blend_point_0/pos = 0.0
+blend_point_1/node = SubResource("AnimationNodeAnimation_pvi31")
+blend_point_1/pos = 1.0
+blend_point_2/node = SubResource("AnimationNodeAnimation_bcp11")
+blend_point_2/pos = -1.0
+blend_mode = 1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_2hrnr"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_ju6by"]
+states/BlendSpace1D/node = SubResource("AnimationNodeBlendSpace1D_t4bb4")
+states/BlendSpace1D/position = Vector2(388, 100)
+transitions = ["Start", "BlendSpace1D", SubResource("AnimationNodeStateMachineTransition_2hrnr")]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_beqb8"]
+radius = 5.09915
+height = 16.9972
+
 [node name="player" type="CharacterBody2D"]
 script = ExtResource("1_jvo3b")
+SPEED = null
+JUMP_VELOCITY = null
+DOUBLE_JUMP_VELOCITY = null
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_1cuur")
+}
+tree_root = SubResource("AnimationNodeStateMachine_ju6by")
+anim_player = NodePath("../AnimationPlayer")
+parameters/BlendSpace1D/blend_position = -0.00078553
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 2)

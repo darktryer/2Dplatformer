@@ -15,7 +15,7 @@ func _process(delta):
 
 
 func _on_back_pressed():
-	get_tree().change_scene_to_file("res://scenes_and_scripts/menu.tscn")
+	get_tree().change_scene_to_file("res://scenes_and_scripts/menu/menu.tscn")
 
 
 func _on_sound_value_slider_value_changed(value):

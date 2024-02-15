@@ -6,6 +6,9 @@
 
 [node name="player" parent="." instance=ExtResource("1_4v7xo")]
 position = Vector2(133, -33)
+SPEED = null
+JUMP_VELOCITY = null
+DOUBLE_JUMP_VELOCITY = null
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="player"]
 remote_path = NodePath("../../Camera2D")

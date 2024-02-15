@@ -69,8 +69,8 @@ layout_mode = 2
 text = "100%"
 
 [node name="back" type="Button" parent="CanvasLayer"]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 43.0
+offset_bottom = 63.0
 theme_override_colors/font_color = Color(1, 0.717647, 0.647059, 1)
 theme_override_font_sizes/font_size = 40
 text = "⇚"
