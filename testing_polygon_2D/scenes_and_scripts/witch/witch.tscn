@@ -1,0 +1,312 @@
+[gd_scene load_steps=12 format=3 uid="uid://1k6rxtkm1lya"]
+
+[ext_resource type="Texture2D" uid="uid://bc1ex0fgljnk5" path="res://sprites/other/B_witch_idle.png" id="1_4pu65"]
+[ext_resource type="Texture2D" uid="uid://bpo31ydnt018t" path="res://sprites/other/B_witch_run.png" id="2_pylsq"]
+[ext_resource type="Texture2D" uid="uid://d2pfn08lw2cx" path="res://sprites/other/B_witch_take_damage.png" id="3_ckfua"]
+
+[sub_resource type="GDScript" id="GDScript_41kh4"]
+script/source = "extends CharacterBody2D
+
+@export var SPEED:float = 200.0
+@export var JUMP_VELOCITY:float = -300.0
+@export var DOUBLE_JUMP_VELOCITY:float = -450.0
+
+@onready var sprite : Sprite2D = $Sprite
+@onready var animation : AnimationPlayer = $AnimationPlayer
+#@onready var animation_tree : AnimationTree = $AnimationTree
+
+# Get the gravity from the project settings to be synced with RigidBody nodes.e
+var gravity = ProjectSettings.get_setting(\"physics/2d/default_gravity\")
+
+var afterJumpIsOnFloorMoment1 = 0
+var afterJumpIsOnFloorMoment2 = 500
+var has_double_jump : bool = false
+var is_jump_pressed = [Input.is_action_pressed(\"jump1\"), Input.is_action_pressed(\"jump2\")]
+var is_just_jump_pressed = [Input.is_action_just_pressed(\"jump1\"), Input.is_action_just_pressed(\"jump2\")]
+var direction1 = Vector2.ZERO
+var direction2 = Vector2.ZERO
+var idle_stop = false
+
+
+func _ready():
+	get_viewport().content_scale_factor = 2.4
+	#animation_tree.active = true
+	#
+#func anim_update(direction):
+	#animation_tree.set(\"parameters/BlendSpace1D/blend_position\", direction.x)
+	#
+	#if not is_on_floor():
+		#if not has_double_jump and (is_just_jump_pressed[0] or is_just_jump_pressed[1]):
+			#animation_tree.set(\"parameters/conditions/can_and_do_double_jump\", true)
+			#velocity.y = DOUBLE_JUMP_VELOCITY
+		#elif has_double_jump:
+			#animation_tree.set(\"parameters/conditions/can_and_do_double_jump\", false)
+			#animation_tree.set(\"parameters/conditions/isnt_on_the_floor_and_no_jump\", true)
+		#else:
+			#animation_tree.set(\"parameters/conditions/isnt_on_the_floor\", true)
+			#animation_tree.set(\"parameters/conditions/can_and_do_double_jump\", false)
+			#
+	#if is_on_floor():
+		#has_double_jump = false
+		#afterJumpIsOnFloorMoment2 = Time.get_ticks_msec()
+		#var noJumpTime = afterJumpIsOnFloorMoment2 - afterJumpIsOnFloorMoment1
+		#if (is_jump_pressed[0] or is_jump_pressed[1]) and noJumpTime > 400:
+			#velocity.y = JUMP_VELOCITY
+			#animation_tree.set(\"parameters/conditions/can_and_do_jump\", true)
+			#animation_tree.set(\"parameters/conditions/is_idle\", false)
+		#elif direction.x != 0:
+			#animation_tree.set(\"parameters/conditions/is_moving\", true)
+		#else:
+			#animation_tree.set(\"parameters/conditions/is_moving\", false)
+			#animation_tree.set(\"parameters/conditions/is_idle\", true)
+			
+	
+func update_facing_direction():
+	if direction1.x > 0 or direction2.x > 0:
+		sprite.flip_h = false
+	elif direction1.x < 0 or direction2.x < 0:
+		sprite.flip_h = true
+
+func _physics_process(delta):
+	# Add the gravity.
+	if not is_on_floor():
+		velocity.y += gravity * delta
+
+	# Handle jump.
+	if is_on_floor():
+		afterJumpIsOnFloorMoment2 = Time.get_ticks_msec()
+		has_double_jump = false
+	var noJumpTime = afterJumpIsOnFloorMoment2 - afterJumpIsOnFloorMoment1
+	
+	if is_jump_pressed[0] or is_jump_pressed[1]:
+		if is_on_floor() and noJumpTime > 400:
+			animation.stop()
+			velocity.y = JUMP_VELOCITY
+			afterJumpIsOnFloorMoment1 = Time.get_ticks_msec()
+		else:
+			animation.play(\"idle\")
+	elif (is_just_jump_pressed[0] or is_just_jump_pressed[1]) and not has_double_jump and not is_on_floor:
+		animation.stop()
+		velocity.y = DOUBLE_JUMP_VELOCITY
+	else:
+		animation.play(\"idle\")
+
+	# Get the input direction and handle the movement/deceleration.
+	# As good practice, you should replace UI actions with custom gameplay actions.
+	direction1 = Input.get_vector(\"move_left1\", \"move_right1\", \"jump1\", \"move_down1\")
+	direction2 = Input.get_vector(\"move_left2\", \"move_right2\", \"jump2\", \"move_down2\")
+	if direction1.x != 0:
+		velocity.x = direction1.x * SPEED
+		animation.assigned_animation = \"run\"
+		#anim_update(direction1)
+	elif direction2.x != 0:
+		velocity.x = direction2.x * SPEED
+		animation.assigned_animation = \"run\"
+		#anim_update(direction2)
+	else:
+		velocity.x = move_toward(velocity.x, 0, SPEED)
+		animation.play(\"idle\")
+
+	update_facing_direction()
+	move_and_slide()
+"
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_ju6by"]
+states/End/position = Vector2(961, 280)
+states/Start/position = Vector2(210, 280)
+graph_offset = Vector2(0, 1.19766)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_beqb8"]
+radius = 3.96601
+height = 15.864
+
+[sub_resource type="Animation" id="Animation_4x0em"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_4pu65")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite:vframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [6]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_syttw"]
+resource_name = "hurt"
+length = 0.6
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("3_ckfua")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite:vframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [3]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [0, 1, 2]
+}
+
+[sub_resource type="Animation" id="Animation_t6pps"]
+resource_name = "idle"
+length = 1.2
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_4pu65")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite:vframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [6]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5]
+}
+
+[sub_resource type="Animation" id="Animation_qt6r2"]
+resource_name = "run"
+length = 1.6
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("2_pylsq")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite:vframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [8]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_d1l3x"]
+_data = {
+"RESET": SubResource("Animation_4x0em"),
+"hurt": SubResource("Animation_syttw"),
+"idle": SubResource("Animation_t6pps"),
+"run": SubResource("Animation_qt6r2")
+}
+
+[node name="witch" type="CharacterBody2D"]
+script = SubResource("GDScript_41kh4")
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource("AnimationNodeStateMachine_ju6by")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2)
+scale = Vector2(1.765, 1.765)
+shape = SubResource("CapsuleShape2D_beqb8")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_d1l3x")
+}
+autoplay = "idle"
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_4pu65")
+vframes = 6

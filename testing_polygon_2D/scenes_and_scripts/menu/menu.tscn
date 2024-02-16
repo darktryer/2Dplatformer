@@ -1,0 +1,74 @@
+[gd_scene load_steps=3 format=3 uid="uid://dd45u0xy7u71b"]
+
+[ext_resource type="Script" path="res://scenes_and_scripts/menu/menu.gd" id="1_eu01t"]
+[ext_resource type="Texture2D" uid="uid://d2cfujwcd3cgw" path="res://backgrounds/otherWorld/backgroundMenu.webp" id="2_4wy6a"]
+
+[node name="main" type="Node2D"]
+script = ExtResource("1_eu01t")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+follow_viewport_enabled = true
+
+[node name="ColorRect" type="TextureRect" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_4wy6a")
+expand_mode = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/ColorRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/ColorRect/CenterContainer"]
+layout_mode = 2
+theme_override_constants/margin_bottom = 585
+
+[node name="gamesName" type="Label" parent="CanvasLayer/ColorRect/CenterContainer/MarginContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 31
+text = "Game's name"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/ColorRect/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 50
+
+[node name="play" type="Button" parent="CanvasLayer/ColorRect/CenterContainer/VBoxContainer"]
+modulate = Color(0.223529, 1, 1, 1)
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+tooltip_text = "press and have fun, bitch!"
+theme_override_colors/font_color = Color(1, 0.717647, 0.647059, 1)
+theme_override_font_sizes/font_size = 26
+text = "Play"
+
+[node name="options" type="Button" parent="CanvasLayer/ColorRect/CenterContainer/VBoxContainer"]
+modulate = Color(0.223529, 1, 1, 1)
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.717647, 0.647059, 1)
+theme_override_font_sizes/font_size = 26
+text = "Options
+"
+
+[node name="quit" type="Button" parent="CanvasLayer/ColorRect/CenterContainer/VBoxContainer"]
+modulate = Color(0.223529, 1, 1, 1)
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "yeah, get out of here!
+"
+theme_override_colors/font_color = Color(1, 0.717647, 0.647059, 1)
+theme_override_font_sizes/font_size = 26
+text = "Quit"
+
+[connection signal="pressed" from="CanvasLayer/ColorRect/CenterContainer/VBoxContainer/play" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="CanvasLayer/ColorRect/CenterContainer/VBoxContainer/options" to="." method="_on_options_pressed"]
+[connection signal="pressed" from="CanvasLayer/ColorRect/CenterContainer/VBoxContainer/quit" to="." method="_on_quit_pressed"]
